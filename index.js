@@ -3,10 +3,15 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import mongoose from "mongoose";
 
+import { registerValidations } from "./validations/auth.js";
+import UserController from "./controllers/UserController.js";
+
 const app = express();
 
 dotenv.config();
 app.use(express.json());
+
+const UserCtrl = new UserController();
 
 mongoose
     .connect(`mongodb+srv://dzhygrynyuk:${process.env.MONGODB_PASS}@cluster0.tmndkp7.mongodb.net/Blog-MERN?retryWrites=true&w=majority`)
@@ -17,26 +22,7 @@ app.get('/', (req, res) => {
     res.send('Hello!');
 });
 
-app.post('/auth/login', (req, res) => {
-    if(req.body.email === 'test@ts.ts'){
-        const token = jwt.sign(
-            {
-                email: req.body.email,
-                fullname: req.body.fullname,
-            },
-            process.env.JWT_SECRET || "",
-            {
-                expiresIn: process.env.JWT_MAX_AGE,
-                algorithm: "HS256"
-            }
-        );
-
-        res.json({
-            success: true,
-            token
-        });
-    }
-});
+app.post('/auth/register', registerValidations, UserCtrl.registration);
 
 app.listen(process.env.PORT, (error) => {
     if(error){
