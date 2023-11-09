@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/auth/register', registerValidations, UserCtrl.registration);
+app.post('/auth/login', registerValidations, UserCtrl.login);
 
 app.listen(process.env.PORT, (error) => {
     if(error){

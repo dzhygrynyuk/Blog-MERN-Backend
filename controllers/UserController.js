@@ -48,6 +48,48 @@ class UserController{
             });
         }
     }
+
+    async login(req, res){
+        try {
+            const user = await UserModel.findOne({ email: req.body.email });
+
+            if(!user){
+                return res.status(404).json({
+                    message: 'User not found'
+                });
+            }
+
+            const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash);
+
+            if(!isValidPass){
+                return res.status(400).json({
+                    message: 'Incorrect login or password'
+                });
+            }
+
+            const token = jwt.sign(
+                {
+                    _id: user._id
+                },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: '7d'
+                }
+            );
+
+            const { passwordHash, ...userData } = user._doc;
+
+            res.json({
+                ...userData,
+                token
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(404).json({
+                message: 'Failed to login'
+            });
+        }
+    }
 }
 
 export default UserController;
