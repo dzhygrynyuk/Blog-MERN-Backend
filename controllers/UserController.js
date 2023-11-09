@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 
 import UserModel from "../models/User.js";
+import User from "../models/User.js";
 
 class UserController{
     async registration(req, res){
@@ -88,6 +89,24 @@ class UserController{
             res.status(404).json({
                 message: 'Failed to login'
             });
+        }
+    }
+
+    async getMe(req, res){
+        try {
+            const user = await UserModel.findById(req.userId);
+
+            if(!user){
+                return res.status(404).json({
+                    message: 'User not found'
+                });
+            }
+
+            const { passwordHash, ...userData } = user._doc;
+
+            res.json(userData);
+        } catch (error) {
+            console.log(error);
         }
     }
 }

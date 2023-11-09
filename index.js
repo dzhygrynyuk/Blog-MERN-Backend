@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import mongoose from "mongoose";
 
 import { registerValidations } from "./validations/auth.js";
+import checkAuth from './middlewares/checkAuth.js';
 import UserController from "./controllers/UserController.js";
 
 const app = express();
@@ -23,7 +24,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/auth/register', registerValidations, UserCtrl.registration);
-app.post('/auth/login', registerValidations, UserCtrl.login);
+app.post('/auth/login', UserCtrl.login);
+app.get('/auth/me', checkAuth, UserCtrl.getMe);
 
 app.listen(process.env.PORT, (error) => {
     if(error){
