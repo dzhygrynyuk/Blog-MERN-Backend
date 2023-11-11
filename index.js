@@ -3,9 +3,11 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import mongoose from "mongoose";
 
-import { registerValidations } from "./validations/auth.js";
+import { registerValidation, loginValidation } from "./validations/auth.js";
+import { postCreateValidation } from "./validations/post.js";
 import checkAuth from './middlewares/checkAuth.js';
 import UserController from "./controllers/UserController.js";
+import PostController from "./controllers/PostController.js";
 
 const app = express();
 
@@ -13,6 +15,7 @@ dotenv.config();
 app.use(express.json());
 
 const UserCtrl = new UserController();
+const PostCtrl = new PostController();
 
 mongoose
     .connect(`mongodb+srv://dzhygrynyuk:${process.env.MONGODB_PASS}@cluster0.tmndkp7.mongodb.net/Blog-MERN?retryWrites=true&w=majority`)
@@ -23,9 +26,15 @@ app.get('/', (req, res) => {
     res.send('Hello!');
 });
 
-app.post('/auth/register', registerValidations, UserCtrl.registration);
-app.post('/auth/login', UserCtrl.login);
+app.post('/auth/register', registerValidation, UserCtrl.registration);
+app.post('/auth/login', loginValidation, UserCtrl.login);
 app.get('/auth/me', checkAuth, UserCtrl.getMe);
+
+//app.get('/posts', PostCtrl.getAll);
+//app.get('/posts/:id', PostCtrl.getItem);
+app.post('/posts', checkAuth, postCreateValidation, PostCtrl.create);
+//app.delete('/posts', PostCtrl.remove);
+//app.patch('/posts', PostCtrl.update);
 
 app.listen(process.env.PORT, (error) => {
     if(error){
