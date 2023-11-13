@@ -21,6 +21,19 @@ class PostController {
             });
         }
     }
+
+    async getAll(req, res){
+        try {
+            const posts = await PostModel.find();
+
+            res.json(posts);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Error while get all posts'
+            });
+        }
+    }
 }
 
 export default PostController;
