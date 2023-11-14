@@ -24,13 +24,44 @@ class PostController {
 
     async getAll(req, res){
         try {
-            const posts = await PostModel.find();
+            const posts = await PostModel.find().populate('user').exec();
 
             res.json(posts);
         } catch (error) {
             console.log(error);
             res.status(500).json({
                 message: 'Error while get all posts'
+            });
+        }
+    }
+
+    async getItem(req, res){
+        try {
+            const postId = req.params.id;
+
+            const doc = await PostModel.findOneAndUpdate(
+                {
+                    _id: postId
+                },
+                {
+                    $inc: { viewsCount: 1 }
+                },
+                {
+                    returnDocument: 'after'
+                }
+            ).populate('user').exec();
+
+            if(!doc){
+                return res.status(404).json({
+                    message: 'Not found post'
+                });
+            }
+
+            res.json(doc);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Error while get post item'
             });
         }
     }

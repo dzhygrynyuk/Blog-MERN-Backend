@@ -31,7 +31,7 @@ app.post('/auth/login', loginValidation, UserCtrl.login);
 app.get('/auth/me', checkAuth, UserCtrl.getMe);
 
 app.get('/posts', PostCtrl.getAll);
-//app.get('/posts/:id', PostCtrl.getItem);
+app.get('/posts/:id', PostCtrl.getItem);
 app.post('/posts', checkAuth, postCreateValidation, PostCtrl.create);
 //app.delete('/posts', PostCtrl.remove);
 //app.patch('/posts', PostCtrl.update);
