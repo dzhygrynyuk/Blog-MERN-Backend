@@ -65,6 +65,29 @@ class PostController {
             });
         }
     }
+
+    async remove(req, res){
+        try {
+            const postId = req.params.id;
+            
+            const doc = await PostModel.findOneAndDelete({ _id: postId });
+
+            if(!doc){
+                return res.status(404).json({
+                    message: 'Not found post'
+                });
+            }
+
+            res.json({
+                success: true
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Detelete post error'
+            });
+        }
+    }
 }
 
 export default PostController;
