@@ -34,7 +34,7 @@ app.get('/posts', PostCtrl.getAll);
 app.get('/posts/:id', PostCtrl.getItem);
 app.post('/posts', checkAuth, postCreateValidation, PostCtrl.create);
 app.delete('/posts/:id', checkAuth, PostCtrl.remove);
-//app.patch('/posts', PostCtrl.update);
+app.patch('/posts/:id', checkAuth, PostCtrl.update);
 
 app.listen(process.env.PORT, (error) => {
     if(error){
