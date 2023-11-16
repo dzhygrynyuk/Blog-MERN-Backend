@@ -1,7 +1,7 @@
 import express from "express";
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import mongoose from "mongoose";
+import multer from "multer";
 
 import { registerValidation, loginValidation } from "./validations/auth.js";
 import { postCreateValidation } from "./validations/post.js";
@@ -9,10 +9,22 @@ import checkAuth from './middlewares/checkAuth.js';
 import UserController from "./controllers/UserController.js";
 import PostController from "./controllers/PostController.js";
 
-const app = express();
-
 dotenv.config();
+
+const app = express();
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+
+const storage = multer.diskStorage({
+    destination: (_, __, cb) => {
+        cb(null, 'uploads');
+    },
+    filename: (_, file, cb) => {
+        cb(null, file.originalname);
+    }
+});
+const upload = multer({ storage });
+
 
 const UserCtrl = new UserController();
 const PostCtrl = new PostController();
@@ -22,13 +34,15 @@ mongoose
     .then(() => console.log('Success connected!!!'))
     .catch((err) => console.log('DB error', err));
 
-app.get('/', (req, res) => {
-    res.send('Hello!');
-});
-
 app.post('/auth/register', registerValidation, UserCtrl.registration);
 app.post('/auth/login', loginValidation, UserCtrl.login);
 app.get('/auth/me', checkAuth, UserCtrl.getMe);
+
+app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
+    res.json({
+        url: `/uploads/${req.file.originalname}`,
+    });
+});
 
 app.get('/posts', PostCtrl.getAll);
 app.get('/posts/:id', PostCtrl.getItem);
