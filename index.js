@@ -6,6 +6,7 @@ import multer from "multer";
 import { registerValidation, loginValidation } from "./validations/auth.js";
 import { postCreateValidation } from "./validations/post.js";
 import checkAuth from './middlewares/checkAuth.js';
+import handleValidationErrors from './middlewares/handleValidationErrors.js';
 import UserController from "./controllers/UserController.js";
 import PostController from "./controllers/PostController.js";
 
@@ -34,8 +35,8 @@ mongoose
     .then(() => console.log('Success connected!!!'))
     .catch((err) => console.log('DB error', err));
 
-app.post('/auth/register', registerValidation, UserCtrl.registration);
-app.post('/auth/login', loginValidation, UserCtrl.login);
+app.post('/auth/register', registerValidation, handleValidationErrors, UserCtrl.registration);
+app.post('/auth/login', loginValidation, handleValidationErrors, UserCtrl.login);
 app.get('/auth/me', checkAuth, UserCtrl.getMe);
 
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
@@ -46,9 +47,9 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
 
 app.get('/posts', PostCtrl.getAll);
 app.get('/posts/:id', PostCtrl.getItem);
-app.post('/posts', checkAuth, postCreateValidation, PostCtrl.create);
+app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostCtrl.create);
 app.delete('/posts/:id', checkAuth, PostCtrl.remove);
-app.patch('/posts/:id', checkAuth, PostCtrl.update);
+app.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostCtrl.update);
 
 app.listen(process.env.PORT, (error) => {
     if(error){
