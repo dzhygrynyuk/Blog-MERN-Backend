@@ -46,6 +46,7 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
         url: `/uploads/${req.file.originalname}`,
     });
 });
+app.get('/tags', PostCtrl.getLastTags);
 
 app.get('/posts', PostCtrl.getAll);
 app.get('/posts/:id', PostCtrl.getItem);
